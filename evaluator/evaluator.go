@@ -28,6 +28,8 @@ func evalWithEnvironment(prog ast.Node, env *environment) *environment {
 		evalPointerStatement(node, env)
 	case *ast.ManipulationStatement:
 		evalManipulationStatement(node, env)
+	case *ast.LoopStatement:
+		evalLoop(node, env)
 	}
 
 	return env
@@ -59,6 +61,15 @@ func evalManipulationStatement(stmt *ast.ManipulationStatement, env *environment
 	case ast.Down:
 		if env.state[env.curPos] > 0 {
 			env.state[env.curPos]--
+		}
+	}
+}
+
+func evalLoop(loop *ast.LoopStatement, env *environment) {
+	counterPos := env.curPos
+	for env.state[counterPos] > 0 {
+		for _, stmt := range loop.Statements {
+			evalWithEnvironment(stmt, env)
 		}
 	}
 }

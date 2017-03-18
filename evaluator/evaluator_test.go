@@ -51,3 +51,30 @@ func TestSimple(t *testing.T) {
 		t.Errorf("Expected state[1] to be 3. Got %d", state[1])
 	}
 }
+
+func TestLoop(t *testing.T) {
+	input := `+++++ +++++            initialize counter (cell #0) to 10
+[                       use loop to set 70/100/30/10
+    > +++++ ++              add  7 to cell #1
+    > +++++ +++++           add 10 to cell #2
+    > +++                   add  3 to cell #3
+    > +                     add  1 to cell #4
+<<<< -                  decrement counter (cell #0)
+]`
+
+	expectedState := []int{0, 70, 100, 30, 10, 0}
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	prog := p.ParseProgram()
+
+	env := Eval(prog)
+
+	state := env.state
+
+	for i, v := range expectedState {
+		if state[i] != v {
+			t.Errorf("State wrong at index %d, expected %d, got %d", i, v, state[i])
+		}
+	}
+}
